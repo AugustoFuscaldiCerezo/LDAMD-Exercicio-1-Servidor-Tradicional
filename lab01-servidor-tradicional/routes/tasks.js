@@ -51,7 +51,9 @@ router.get('/', async (req, res) => {
                 total: countRow ? countRow.total : 0
             }
         }, null, 2));
+        console.log(`[${new Date().toISOString()}] Tarefas listadas para o usuário: ${req.user.username}`);
     } catch (error) {
+        console.error(`[${new Date().toISOString()}] Erro ao listar tarefas para o usuário: ${req.user.username}`, error.message);
         res.status(500).json({ success: false, message: 'Erro interno do servidor' });
     }
 });
@@ -81,12 +83,15 @@ router.post('/', validate('task'), async (req, res) => {
             [task.id, task.title, task.description, task.priority, task.userId]
         );
 
+        
         res.status(201).json({
             success: true,
             message: 'Tarefa criada com sucesso',
             data: task.toJSON()
         });
+        console.log(`[${new Date().toISOString()}] Tarefa criada: ${task.id} ${task.title}`);
     } catch (error) {
+        console.error(`[${new Date().toISOString()}] Erro ao criar tarefa`, error.message);
         res.status(500).json({ success: false, message: 'Erro interno do servidor' });
     }
 });
@@ -128,8 +133,9 @@ router.get('/:id', async (req, res) => {
             success: true,
             data: task.toJSON()
         });
+        console.log(`[${new Date().toISOString()}] Tarefa buscada: ${req.params.id} (Cache: ${tasksCache[req.params.id] ? 'Hit' : 'Miss'})`);
     } catch (error) {
-        console.error(error);
+        console.error(`[${new Date().toISOString()}] Erro ao buscar tarefa: ${req.params.id}`, error.message);
         res.status(500).json({ success: false, message: 'Erro interno do servidor' });
     }
 });
@@ -158,12 +164,15 @@ router.put('/:id', async (req, res) => {
 
         const task = new Task({ ...updatedRow, completed: updatedRow.completed === 1 });
 
+        
         res.json({
             success: true,
             message: 'Tarefa atualizada com sucesso',
             data: task.toJSON()
         });
+        console.log(`[${new Date().toISOString()}] Tarefa atualizada: ${req.params.id}`);
     } catch (error) {
+        console.error(`[${new Date().toISOString()}] Erro ao atualizar tarefa: ${req.params.id}`, error.message);
         res.status(500).json({ success: false, message: 'Erro interno do servidor' });
     }
 });
@@ -187,7 +196,9 @@ router.delete('/:id', async (req, res) => {
             success: true,
             message: 'Tarefa deletada com sucesso'
         });
+        console.log(`[${new Date().toISOString()}] Tarefa deletada: ${req.params.id}`);
     } catch (error) {
+        console.error(`[${new Date().toISOString()}] Erro ao deletar tarefa: ${req.params.id}`, error.message);
         res.status(500).json({ success: false, message: 'Erro interno do servidor' });
     }
 });

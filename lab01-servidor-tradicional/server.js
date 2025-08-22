@@ -29,9 +29,19 @@ app.use(cors());
 app.use(bodyParser.json({ limit: '10mb' }));
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Logging de requisições
+// Logging de requisições aprimorado
 app.use((req, res, next) => {
-    console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+    const start = Date.now();
+    res.on('finish', () => {
+        const duration = Date.now() - start;
+        let statusMsg = 'Sucesso';
+        if (res.statusCode === 401) statusMsg = 'Falha de autentificação';
+        if (res.statusCode === 404) statusMsg = 'Endpoint não encontrado';
+        if (res.statusCode === 500) statusMsg = 'Erro interno do Servidor';
+        console.log(
+            `${new Date().toISOString()} - ${req.method} ${req.originalUrl} - status: ${res.statusCode} - ${statusMsg} - tempo: ${duration}ms - IP: ${req.ip}`
+        );
+    });
     next();
 });
 
@@ -61,6 +71,10 @@ app.get('/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/tasks', taskRoutes);
 
+app.get('/simular-erro', (req, res) => {
+    throw new Error('Erro interno simulado para teste');
+});
+
 // 404 handler
 app.use('*', (req, res) => {
     res.status(404).json({
@@ -71,7 +85,15 @@ app.use('*', (req, res) => {
 
 // Error handler global
 app.use((error, req, res, next) => {
-    console.error('Erro:', error);
+    console.error('Erro:', {
+        mensagem: error.message,
+        stack: error.stack,
+        metodo: req.method,
+        url: req.originalUrl,
+        body: req.body,
+        usuario: req.user ? req.user : null,
+        ip: req.ip
+    });
     res.status(500).json({
         success: false,
         message: 'Erro interno do servidor'
@@ -82,7 +104,7 @@ app.use((error, req, res, next) => {
 async function startServer() {
     try {
         await database.init();
-        
+
         app.listen(config.port, () => {
             console.log('🚀 =================================');
             console.log(`🚀 Servidor iniciado na porta ${config.port}`);

@@ -7,6 +7,7 @@ const { validate } = require('../middleware/validation');
 const { number } = require('joi');
 
 const router = express.Router();
+const tasksCache = {};
 
 // Todas as rotas requerem autenticação
 router.use(authMiddleware);
@@ -93,6 +94,14 @@ router.post('/', validate('task'), async (req, res) => {
 // Buscar tarefa por ID
 router.get('/:id', async (req, res) => {
     try {
+        if (tasksCache[req.params.id]) {
+            return res.json({
+                success: true,
+                data: tasksCache[req.params.id].toJSON(),
+                message: 'Tarefa encontrada no cache'
+            });
+        }
+
         const row = await database.get(
             'SELECT * FROM tasks WHERE id = ? AND userId = ?',
             [req.params.id, req.user.id]
@@ -106,11 +115,21 @@ router.get('/:id', async (req, res) => {
         }
 
         const task = new Task({ ...row, completed: row.completed === 1 });
+        if (!tasksCache[req.params.id]) {
+            tasksCache[req.params.id] = task;
+            const cacheKeys = Object.keys(tasksCache);
+            //O cache está em apenas 5 para facilitar os testes
+            if (cacheKeys.length > 5) {
+                delete tasksCache[cacheKeys[0]];
+            }
+        }
+
         res.json({
             success: true,
             data: task.toJSON()
         });
     } catch (error) {
+        console.error(error);
         res.status(500).json({ success: false, message: 'Erro interno do servidor' });
     }
 });

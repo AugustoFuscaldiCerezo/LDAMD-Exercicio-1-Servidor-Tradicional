@@ -36,12 +36,14 @@ router.post('/register', validate('register'), async (req, res) => {
 
         const token = user.generateToken();
 
+        console.log(`[${new Date().toISOString()}] Usuário registrado: ${email}`);
         res.status(201).json({
             success: true,
             message: 'Usuário criado com sucesso',
             data: { user: user.toJSON(), token }
         });
     } catch (error) {
+        console.error(`[${new Date().toISOString()}] Erro ao registrar usuário: ${req.body.email}`, error.message);
         res.status(500).json({ success: false, message: 'Erro interno do servidor' });
     }
 });
@@ -75,12 +77,14 @@ router.post('/login', validate('login'), async (req, res) => {
 
         const token = user.generateToken();
 
+        console.log(`[${new Date().toISOString()}] Login bem-sucedido para usuário: ${req.body.identifier}`);
         res.json({
             success: true,
             message: 'Login realizado com sucesso',
             data: { user: user.toJSON(), token }
         });
     } catch (error) {
+        console.error(`[${new Date().toISOString()}] Falha no login para usuário: ${req.body.identifier}`, error.message);
         res.status(500).json({ success: false, message: 'Erro interno do servidor' });
     }
 });

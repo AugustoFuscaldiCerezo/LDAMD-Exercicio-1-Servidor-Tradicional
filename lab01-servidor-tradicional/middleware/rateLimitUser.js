@@ -5,7 +5,7 @@ const { ipKeyGenerator } = require('express-rate-limit');
 
 const userRateLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
-    max: 2,
+    max: 1000,
     keyGenerator: (req) => {
         const authHeader = req.headers['authorization'];
         if (authHeader && authHeader.startsWith('Bearer ')) {

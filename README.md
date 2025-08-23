@@ -1,3 +1,8 @@
+## Alunos:
+
+- Augusto Fuscaldi Cerezo
+- Filipe Faria Melo
+
 ## Limites da arquitetura
 
 **Banco de Dados:**

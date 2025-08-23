@@ -37,6 +37,7 @@ app.use((req, res, next) => {
         let statusMsg = 'Sucesso';
         if (res.statusCode === 401) statusMsg = 'Falha de autentificação';
         if (res.statusCode === 404) statusMsg = 'Endpoint não encontrado';
+        if (res.statusCode === 429) statusMsg = 'Limite de requisições excedido';
         if (res.statusCode === 500) statusMsg = 'Erro interno do Servidor';
         console.log(
             `${new Date().toISOString()} - ${req.method} ${req.originalUrl} - status: ${res.statusCode} - ${statusMsg} - tempo: ${duration}ms - IP: ${req.ip}`

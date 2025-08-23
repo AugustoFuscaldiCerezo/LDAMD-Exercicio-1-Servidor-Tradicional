@@ -3,7 +3,9 @@ const { v4: uuidv4 } = require('uuid');
 const Task = require('../models/Task');
 const database = require('../database/database');
 const { authMiddleware } = require('../middleware/auth');
+//const auth = require('../middleware/auth');
 const { validate } = require('../middleware/validation');
+const userRateLimiter = require('../middleware/rateLimitUser');
 const { number } = require('joi');
 
 const router = express.Router();
@@ -11,6 +13,7 @@ const tasksCache = {};
 
 // Todas as rotas requerem autenticação
 router.use(authMiddleware);
+router.use(authMiddleware, userRateLimiter);
 
 // Listar tarefas
 router.get('/', async (req, res) => {

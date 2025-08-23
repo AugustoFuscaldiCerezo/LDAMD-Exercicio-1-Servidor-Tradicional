@@ -20,6 +20,13 @@
 
 **Segurança:**
 - JWT é utilizado, mas não há proteção contra brute force, CSRF, CORS configurado, etc.
+---
+
+**Métricas de Performance Reais:**
+
+- Latência:	6,283 ms
+- Throughput:	300 RPS
+- Memória:	2,1 MB
 
 ---
 ## Documentação da API

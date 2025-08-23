@@ -35,6 +35,7 @@ app.use((req, res, next) => {
     res.on('finish', () => {
         const duration = Date.now() - start;
         let statusMsg = 'Sucesso';
+        if (res.statusCode === 400) statusMsg = 'Bad request';
         if (res.statusCode === 401) statusMsg = 'Falha de autentificação';
         if (res.statusCode === 404) statusMsg = 'Endpoint não encontrado';
         if (res.statusCode === 429) statusMsg = 'Limite de requisições excedido';

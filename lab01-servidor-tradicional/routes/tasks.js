@@ -3,10 +3,11 @@ const { v4: uuidv4 } = require('uuid');
 const Task = require('../models/Task');
 const database = require('../database/database');
 const { authMiddleware } = require('../middleware/auth');
-//const auth = require('../middleware/auth');
 const { validate } = require('../middleware/validation');
 const userRateLimiter = require('../middleware/rateLimitUser');
 const { number } = require('joi');
+const { sendPaginatedResponse } = require('../utils/response');
+const { getTasksWithFilter } = require('../services/taskService');
 
 const router = express.Router();
 const tasksCache = {};
@@ -99,6 +100,89 @@ router.post('/', validate('task'), async (req, res) => {
     }
 });
 
+// Buscar tarefas por descrição
+router.get('/by-description', async (req, res) => {
+    try {
+        const { description} = req.query;
+        if (!description) {
+            return res.status(400).json({
+                success: false,
+                message: 'Parâmetro "description" é obrigatório (ex: test)'
+            });
+        }
+
+        const { rows, countRow, page, limit } = await getTasksWithFilter({
+            userId: req.user.id,
+            filterSql: 'AND description LIKE ?',
+            filterParams: [`%${description}%`],
+            query: req.query
+        });
+
+        console.log(`[${new Date().toISOString()}] Tarefas listadas para o usuário: ${req.user.username}`);
+        return sendPaginatedResponse(res, rows, countRow, page, limit);
+    } catch (error) {
+        console.error(`[${new Date().toISOString()}] Erro ao buscar tarefas por descrição:`, error.message);
+        res.status(500).json({ success: false, message: 'Erro interno do servidor' });
+    }
+});
+
+// Buscar tarefas por data
+router.get('/by-date', async (req, res) => {
+    try {
+
+        const { date } = req.query;
+        if (!date) {
+            return res.status(400).json({
+                success: false,
+                message: 'Parâmetro "date" é obrigatório (ex: 2025-08-12 ou 2025-08)'
+            });
+        }
+
+        const { rows, countRow, page, limit } = await getTasksWithFilter({
+            userId: req.user.id,
+            filterSql: 'AND createdAt LIKE ?',
+            filterParams: [`${date}%`],
+            query: req.query
+        });
+
+        console.log(`[${new Date().toISOString()}] Tarefas listadas para o usuário: ${req.user.username}`);
+        return sendPaginatedResponse(res, rows, countRow, page, limit);
+        
+    } catch (error) {
+        console.error(`[${new Date().toISOString()}] Erro ao buscar tarefas por data:`, error.message);
+        res.status(500).json({ success: false, message: 'Erro interno do servidor' });
+    }
+});
+
+// Buscar tarefas por prioridade
+router.get('/by-priority', async (req, res) => {
+    try {
+
+        const { priority } = req.query;
+        if (!priority) {
+            return res.status(400).json({
+                success: false,
+                message: 'Parâmetro "priority" é obrigatório (ex: urgent, high, medium, low)'
+            });
+
+        }
+
+        const { rows, countRow, page, limit } = await getTasksWithFilter({
+            userId: req.user.id,
+            filterSql: 'AND priority = ?',
+            filterParams: [priority],
+            query: req.query
+        });
+
+        console.log(`[${new Date().toISOString()}] Tarefas listadas para o usuário: ${req.user.username}`);
+        return sendPaginatedResponse(res, rows, countRow, page, limit);
+        
+    } catch (error) {
+        console.error(`[${new Date().toISOString()}] Erro ao buscar tarefas por prioridade:`, error.message);
+        res.status(500).json({ success: false, message: 'Erro interno do servidor' });
+    }
+});
+
 // Buscar tarefa por ID
 router.get('/:id', async (req, res) => {
     try {
@@ -132,16 +216,19 @@ router.get('/:id', async (req, res) => {
             }
         }
 
-        res.json({
+        res.setHeader('Content-Type', 'application/json');
+        res.send(JSON.stringify({
             success: true,
-            data: task.toJSON()
-        });
+            data: row,
+        }, null, 2));
         console.log(`[${new Date().toISOString()}] Tarefa buscada: ${req.params.id} (Cache: ${tasksCache[req.params.id] ? 'Hit' : 'Miss'})`);
     } catch (error) {
         console.error(`[${new Date().toISOString()}] Erro ao buscar tarefa: ${req.params.id}`, error.message);
         res.status(500).json({ success: false, message: 'Erro interno do servidor' });
     }
 });
+
+
 
 // Atualizar tarefa
 router.put('/:id', async (req, res) => {

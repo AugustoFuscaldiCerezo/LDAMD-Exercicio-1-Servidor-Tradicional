@@ -5,11 +5,17 @@
 ---
 
 **Questionamentos - Servidor Tradicional**
-Escalabilidade	Limitada por SQLite e servidor único. Não recomendado para muitos usuários simultâneos.
+
+Escalabilidade:	Limitada por SQLite e servidor único. Não recomendado para muitos usuários simultâneos.
+
 Disponibilidade	Baixa: pontos únicos de falha (servidor, banco, cache).
-Performance	Gargalo principal é o SQLite; Node.js single-thread limita processamento paralelo.
-Manutenção	Atualização exige downtime; não há automação para deploy seguro.
-Evolução	Exige migração de banco, cache e rate limit para soluções distribuídas e multi-região.
+
+Performance:	Gargalo principal é o SQLite; Node.js single-thread limita processamento paralelo.
+
+Manutenção:	Atualização exige downtime; não há automação para deploy seguro.
+
+Evolução:	Exige migração de banco, cache e rate limit para soluções distribuídas e multi-região.
+
 
 ## Limites da arquitetura
 
@@ -37,9 +43,9 @@ Evolução	Exige migração de banco, cache e rate limit para soluções distrib
 
 **Métricas de Performance Reais:**
 
-- Latência:	6,283 ms
-- Throughput:	300 RPS
-- Memória:	2,1 MB
+- Latência:	5 ms
+- Throughput:	~2400-2600 req/sec
+- Memória:	55.6 MB
 
 ---
 ## Documentação da API

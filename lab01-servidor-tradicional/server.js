@@ -22,7 +22,7 @@ const app = express();
 
 // Middleware de segurança
 app.use(helmet());
-app.use(rateLimit(config.rateLimit));
+//app.use(rateLimit(config.rateLimit));
 app.use(cors());
 
 // Parsing de dados

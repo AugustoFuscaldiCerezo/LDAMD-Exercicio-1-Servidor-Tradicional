@@ -13,7 +13,7 @@ const router = express.Router();
 const tasksCache = {};
 
 // Todas as rotas requerem autenticação
-router.use(authMiddleware);
+//router.use(authMiddleware);
 router.use(authMiddleware, userRateLimiter);
 
 // Listar tarefas

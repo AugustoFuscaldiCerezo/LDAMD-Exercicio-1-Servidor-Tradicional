@@ -2,6 +2,14 @@
 
 - Augusto Fuscaldi Cerezo
 - Filipe Faria Melo
+---
+
+**Questionamentos - Servidor Tradicional**
+Escalabilidade	Limitada por SQLite e servidor único. Não recomendado para muitos usuários simultâneos.
+Disponibilidade	Baixa: pontos únicos de falha (servidor, banco, cache).
+Performance	Gargalo principal é o SQLite; Node.js single-thread limita processamento paralelo.
+Manutenção	Atualização exige downtime; não há automação para deploy seguro.
+Evolução	Exige migração de banco, cache e rate limit para soluções distribuídas e multi-região.
 
 ## Limites da arquitetura
 

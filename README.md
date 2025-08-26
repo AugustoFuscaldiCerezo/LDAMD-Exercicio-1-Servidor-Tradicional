@@ -43,7 +43,7 @@ Evolução:	Exige migração de banco, cache e rate limit para soluções distri
 
 **Métricas de Performance Reais:**
 
-- Latência:	5 ms
+- Latência:	35 ms
 - Throughput:	~2400-2600 req/sec
 - Memória:	55.6 MB
 

@@ -4,8 +4,8 @@ const { jwtSecret } = require('../config/database');
 const { ipKeyGenerator } = require('express-rate-limit');
 
 const userRateLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 1000,
+    windowMs: 1 * 60 * 1000,
+    max: 200,
     keyGenerator: (req) => {
         const authHeader = req.headers['authorization'];
         if (authHeader && authHeader.startsWith('Bearer ')) {
